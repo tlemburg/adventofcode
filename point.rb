@@ -15,11 +15,11 @@ class Point
   end
 
   def mx
-
+    self.new(x-1, y)
   end
 
   def my
-
+    self.new(x, y-1)
   end
 
   def to_s
