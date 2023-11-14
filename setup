@@ -1,7 +1,6 @@
 #!/bin/sh
 
-mkdir $1
-mkdir $1/$2
+mkdir -p $1/$2
 cp part1.rb $1/$2
 cp next_part $1/$2
 touch $1/$2/test_in.txt
