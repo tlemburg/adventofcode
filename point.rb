@@ -1,5 +1,5 @@
 class Point
-  attr_writer :x, :y
+  attr_accessor :x, :y
 
   def initialize(x, y)
     @x = x
