@@ -5,3 +5,4 @@ cp part1.rb $1/$2
 cp next_part $1/$2
 touch $1/$2/test_in.txt
 touch $1/$2/real_in.txt
+cd $1/$2
