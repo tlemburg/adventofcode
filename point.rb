@@ -6,20 +6,20 @@ class Point
     @y = y
   end
 
-  def px
-    self.new(x+1, y)
+  def px(inc = 1)
+    self.class.new(x+inc, y)
   end
 
-  def py
-    self.new(x, y+1)
+  def py(inc = 1)
+    self.class.new(x, y+inc)
   end
 
-  def mx
-    self.new(x-1, y)
+  def mx(dec = 1)
+    self.class.new(x-dec, y)
   end
 
-  def my
-    self.new(x, y-1)
+  def my(dec = 1)
+    self.class.new(x, y-dec)
   end
 
   def to_s
