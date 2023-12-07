@@ -30,7 +30,7 @@ class Hand
     :high_card
   ].reverse 
 
-  CARDS = %w(A K Q J T 9 8 7 6 5 4 3 2).reverse
+  CARDS = %w(A K Q T 9 8 7 6 5 4 3 2 J).reverse
 
   def to_s
     @cards.join
@@ -41,8 +41,26 @@ class Hand
     raise 'oh whaat' if @cards.count != 5
   end
 
-  def type
-    tally = @cards.tally.to_a.sort_by(&:last).reverse
+  def type(cards = @cards)
+    if cards.include?('J')
+      subhands = CARDS[1..-1].map do |card|
+        subcards = cards.dup
+        subcards[subcards.index('J')] = card
+        type(subcards)
+      end
+
+      subhands.sort_by do |subhand|
+        TYPES.index(subhand)
+      end.last
+
+    else
+      hand_type(cards)
+    end
+
+  end
+
+  def hand_type(cards)
+    tally = cards.tally.to_a.sort_by(&:last).reverse
     return :five_of_a_kind if tally.count == 1
     return :four_of_a_kind if tally.first.last == 4
     return :full_house if tally.first.last == 3 && tally.last.last == 2
