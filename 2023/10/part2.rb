@@ -35,13 +35,12 @@ if ['F', 'L', '-'].include?(map[curr.mx])
   left = true
 end
 if ['L', '|', 'J'].include?(map[curr.py])
-
   next_point = curr.py
   down = true
 end
 if ['J', '7', '-'].include?(map[curr.px])
+  next_point = curr.px
   right = true
-  curr.px
 end
 
 path = {curr: true}
