@@ -16,41 +16,18 @@ File.readlines(in_file, chomp: true).each_with_index do |line, y|
   end
 end
 
-lines_copy = []
-lines.each do |line|
-  lines_copy << line.dup
-  if line.chars.uniq == ['.']
-    lines_copy << line.dup
-  end
-end
+y_empty = []
+x_empty = []
 
-lines = lines_copy.dup
-lines_copy = []
-x_to_expand = []
-
-(0...lines[0].length).each do |i|
-  if lines.map { |line| line[i] }.uniq == ['.']
-    x_to_expand << i
-  end
-end
-
-lines.each do |line|
-  inserted = 0
-  line_copy = line.dup
-  x_to_expand.each do |x|
-    line_copy.insert(x + inserted, '.')
-    inserted += 1
-  end
-
-  lines_copy << line_copy
-end
-
-lines = lines_copy.dup
-
-map = {}
 lines.each_with_index do |line, y|
-  line.chars.each_with_index do |char, x|
-    map[Point.new(x,y)] = char
+  if line.chars.uniq == ['.']
+    y_empty << y
+  end
+end
+
+(0...lines[0].length).each do |x|
+  if lines.map {|line| line[x]}.uniq == ['.']
+    x_empty << x
   end
 end
 
@@ -58,12 +35,32 @@ galaxies = map.select do |key, value|
   value == '#'
 end.keys
 
+EMPTY_SPACE = 1000000
+
 total = 0
 (0...galaxies.count).each do |i|
   gal1 = galaxies[i]
   (i+1...galaxies.count).each do |j|
     gal2 = galaxies[j]
-    total += gal1.manhattan(gal2)
+    manhattan = gal1.manhattan(gal2)
+
+    x_range = ([gal1.x, gal2.x].sort.first..[gal1.x, gal2.x].sort.last)
+    y_range = ([gal1.y, gal2.y].sort.first..[gal1.y, gal2.y].sort.last)
+
+    empty_count = 0
+    x_empty.each do |x|
+      if x_range.include?(x)
+        empty_count += 1
+      end
+    end
+    y_empty.each do |y|
+      if y_range.include?(y)
+        empty_count += 1
+      end
+    end
+
+    total += manhattan + empty_count * (EMPTY_SPACE - 1)
+
   end
 end
 
