@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative '../../point'
+require 'set'
 
 test = ARGV[0] == '--test'
 
@@ -15,6 +16,6 @@ File.readlines(in_file, chomp: true).each_with_index do |line, y|
     map[Point.new(x,y)] = char
   end
 end
-y_max = lines.count - 1
-x_max = lines[0].length - 1
 
+x_max = lines[0].length - 1
+y_max = lines.count - 1
