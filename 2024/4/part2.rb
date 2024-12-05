@@ -9,6 +9,7 @@ in_file = test ? 'test_in.txt' : 'real_in.txt'
 
 lines = []
 map = {}
+map.default = 't'
  
 File.readlines(in_file, chomp: true).each_with_index do |line, y|
   lines << line
@@ -21,32 +22,19 @@ end
 x_max = lines[0].length - 1
 y_max = lines.count - 1
 
-def valid_x(point, map)
+def valid_m(point, map)
   total = 0
 
-  if map[point.px] == 'M' && map[point.px(2)] == 'A' && map[point.px(3)] == 'S'
+  if map[point.px.py] == 'A' && map[point.px(2).py(2)] == 'S' && [map[point.px.py.px.my], map[point.px.py.mx.py]].sort == ['M', 'S']
     total += 1
   end
-  if map[point.py] == 'M' && map[point.py(2)] == 'A' && map[point.py(3)] == 'S'
+  if map[point.mx.my] == 'A' && map[point.mx(2).my(2)] == 'S' && [map[point.mx.my.px.my], map[point.mx.my.mx.py]].sort == ['M', 'S']
     total += 1
   end
-  if map[point.mx] == 'M' && map[point.mx(2)] == 'A' && map[point.mx(3)] == 'S'
+  if map[point.mx.py] == 'A' && map[point.mx(2).py(2)] == 'S' && [map[point.mx.py.px.py], map[point.mx.py.mx.my]].sort == ['M', 'S']
     total += 1
   end
-  if map[point.my] == 'M' && map[point.my(2)] == 'A' && map[point.my(3)] == 'S'
-    total += 1
-  end
-
-  if map[point.px.py] == 'M' && map[point.px(2).py(2)] == 'A' && map[point.px(3).py(3)] == 'S'
-    total += 1
-  end
-  if map[point.mx.py] == 'M' && map[point.mx(2).py(2)] == 'A' && map[point.mx(3).py(3)] == 'S'
-    total += 1
-  end
-  if map[point.px.my] == 'M' && map[point.px(2).my(2)] == 'A' && map[point.px(3).my(3)] == 'S'
-    total += 1
-  end
-  if map[point.mx.my] == 'M' && map[point.mx(2).my(2)] == 'A' && map[point.mx(3).my(3)] == 'S'
+  if map[point.px.my] == 'A' && map[point.px(2).my(2)] == 'S' && [map[point.px.my.px.py], map[point.px.my.mx.my]].sort == ['M', 'S']
     total += 1
   end
   total
@@ -55,9 +43,9 @@ end
 sum = 0
 
 map.each do |point, letter|
-  if letter == 'X'
-    sum += valid_x(point, map)
+  if letter == 'M'
+    sum += valid_m(point, map)
   end
 end
 
-puts sum
+puts sum / 2
