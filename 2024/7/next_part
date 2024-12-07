@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cp part1.rb part2.rb
