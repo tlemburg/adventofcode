@@ -20,3 +20,5 @@ end
 # Assuming the map is a rectangle
 x_max = lines[0].length - 1
 y_max = lines.count - 1
+x_range = (0..x_max)
+y_range = (0..y_max)
