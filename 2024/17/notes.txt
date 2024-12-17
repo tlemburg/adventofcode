@@ -1,0 +1,34 @@
+
+
+2,4
+B = A mod 8
+
+1,1
+B = 1 ^ B
+B = 001 ^ B
+
+8 possible values for B based on A
+
+7,5
+C = A / 2**B = A / (2**(1 ^ (A mod 8)))
+
+C has 8 possible 3-bit values I guess...
+
+4,7
+
+110 =  ^ 
+B = B ^ C
+
+B must be 6 = 110
+
+1,4
+4 = 100 B = 110 = 6
+B = 4 ^ B
+
+0,3
+Divide A by 8
+
+B must be 2 = 010
+
+5,5
+Output register B mod 8
