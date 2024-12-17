@@ -1,34 +1,49 @@
+FINAL RUN
 
+A = 5 or A = 1
 
 2,4
 B = A mod 8
+
+
+B = 5 or B = 1
 
 1,1
 B = 1 ^ B
 B = 001 ^ B
 
-8 possible values for B based on A
+B = 4 or B = 0
 
 7,5
-C = A / 2**B = A / (2**(1 ^ (A mod 8)))
+C = A / 2**B # this is the same as a bitshift of B bits
+A is currently less than 8
+if B = 0: C = 0..7
+if B = 1: C = 0..3
+if B = 2: C = 0..1
+if B >= 3: C = 0
 
-C has 8 possible 3-bit values I guess...
+I think these are the only options at this point
+B = 4: C = 0, Works: if C = 0 then A could be 0..7
+B = 0: C = 4, Works: if C = 4 then A = 4
 
 4,7
-
-110 =  ^ 
 B = B ^ C
+100 =  ^ 
 
-B must be 6 = 110
-
+B must be 4 = 100
 1,4
-4 = 100 B = 110 = 6
 B = 4 ^ B
+B now = 000
 
+A must be less than 8
 0,3
 Divide A by 8
+A is now 0
 
-B must be 2 = 010
+B must be 0 = 000
 
 5,5
 Output register B mod 8
+
+3,0
+Jump to 0 if A is not zero

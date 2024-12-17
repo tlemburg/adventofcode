@@ -59,85 +59,84 @@ class Registers
   end
 end
 
-found = false
-counter = 8000000000
+ok_states = [['', 1]]
 
-while !found
-  puts "Program beginning with #{counter}" if counter % 1000000 == 0
-  reg = Registers.new(a: counter, b: reg_b, c: reg_c)
-  pointer = 0
-  halt = false
+while ok_states.any?
+  ok_state = ok_states.shift
+  final_a = ok_state.first
+  step = ok_state.last
 
-  while !halt
-    if pointer >= program.count || pointer < 0
-      halt = true
-      next
-    end
+  # Try appending 000...111 to the START of final A, and use each in a 
+  # reg. 
+  (0..7).each do |b10a|
+    a = "#{final_a}#{b10a.to_s(2).rjust(3, '0')}".to_i(2)
 
-    jumping = false
-    opcode = program[pointer]
-    operand = program[pointer+1]
-    case opcode
-    when 0
-      num = reg.a
-      denom = 2**reg.combo(operand)
-      reg.a = num / denom
-    when 1
-      reg.b = reg.b ^ operand
-    when 2
-      reg.b = reg.combo(operand) % 8
-    when 3
-      if reg.a != 0
-        jumping = true
-        pointer = operand
-      end
-    when 4
-      reg.b = reg.b ^ reg.c
-    when 5
-      reg.output << reg.combo(operand) % 8
-    when 6
-      num = reg.a
-      denom = 2**reg.combo(operand)
-      reg.b = num / denom
-    when 7
-      num = reg.a
-      denom = 2**reg.combo(operand)
-      reg.c = num / denom
-    end
+    reg = Registers.new(a: a, b: reg_b, c: reg_c)
+    pointer = 0
+    halt = false
 
-    if !jumping
-      pointer += 2
-    end
-
-    if opcode == 5
-      if reg.output.first == 2
-        puts "Counter: #{counter}"
-        puts "Output: #{reg.output.join(',')}"
-      end
-
-      
-      if reg.output.count > program.count
+    while !halt
+      if pointer >= program.count || pointer < 0
         halt = true
+        next
       end
 
-      (0...reg.output.count).each do |i|
-        if reg.output[i] != program[i]
-          halt = true
-          break
+      jumping = false
+      opcode = program[pointer]
+      operand = program[pointer+1]
+      case opcode
+      when 0
+        num = reg.a
+        denom = 2**reg.combo(operand)
+        reg.a = num / denom
+      when 1
+        reg.b = reg.b ^ operand
+      when 2
+        reg.b = reg.combo(operand) % 8
+      when 3
+        if reg.a != 0
+          jumping = true
+          pointer = operand
         end
+      when 4
+        reg.b = reg.b ^ reg.c
+      when 5
+        reg.output << reg.combo(operand) % 8
+      when 6
+        num = reg.a
+        denom = 2**reg.combo(operand)
+        reg.b = num / denom
+      when 7
+        num = reg.a
+        denom = 2**reg.combo(operand)
+        reg.c = num / denom
+      end
+
+      if !jumping
+        pointer += 2
       end
     end
 
+    puts "A: #{a} : #{a.to_s(2).rjust(step*3, '0').chars.each_slice(3).map(&:join).join('-')}"
+    puts "Output: #{reg.output.join(',')}"
+
+    if reg.output == program
+      puts "FOUND!!!"
+      puts reg.output.join(',')
+      puts a
+      exit
+    end
+
+    if reg.output == program[-step..-1]
+      # This is a good result
+      puts "Good result found"
+      puts "Output: #{reg.output.join(',')}"
+      ok_states << ["#{final_a}#{b10a.to_s(2).rjust(3, '0')}", step + 1]
+    end
+    puts '------'
+
+    
   end
 
-  if reg.output == program
-    puts "FOUND!!!"
-    puts reg.output.join(',')
-    puts counter
-    found = true
-    exit
-  end
-
-
-  counter += 1
+  step += 1
 end
