@@ -22,6 +22,26 @@ class Point
     self.class.new(x, y-dec)
   end
 
+  def left
+    self.mx
+  end
+
+  def right
+    self.px
+  end
+
+  def up
+    self.my
+  end
+
+  def down
+    self.py
+  end
+
+  def neighbors
+    [self.px, self.py, self.my, self.mx]
+  end
+
   def to_s
     "<#{x},#{y}>"
   end
