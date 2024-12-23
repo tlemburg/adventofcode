@@ -6,6 +6,10 @@ class Point
     @y = y
   end
 
+  def dup
+    self.new(x,y)
+  end
+
   def px(inc = 1)
     self.class.new(x+inc, y)
   end
