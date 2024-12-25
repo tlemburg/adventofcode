@@ -30,15 +30,16 @@ end.to_a.first.first
 total = 0
 
 class State
-  attr_accessor :map, :guard_point, :guard_dir, :traversed, :object_placed, :moves
+  attr_accessor :map, :guard_point, :guard_dir, :traversed, :object_placed, :moves, :obstacle
 
-  def initialize(map:, guard_point:, guard_dir:, traversed:, moves:, object_placed: false)
+  def initialize(map:, guard_point:, guard_dir:, traversed:, moves:, object_placed: false, obstacle: nil)
     @map = map.dup
     @guard_point = guard_point.dup
     @guard_dir = guard_dir.dup
     @object_placed = object_placed
     @traversed = traversed.dup
     @moves = moves
+    @obstacle = obstacle
   end
 
   def copy
@@ -48,7 +49,8 @@ class State
       guard_point: self.guard_point,
       guard_dir: self.guard_dir,
       object_placed: self.object_placed,
-      traversed: self.traversed
+      traversed: self.traversed,
+      obstacle: self.obstacle,
     )
   end
 
@@ -64,13 +66,25 @@ class State
     unless self.object_placed
       case self.guard_dir
       when :up
-        self.map[guard_point.my] = '#' if $y_range.include?(guard_point.my.y) && self.map[guard_point.my] != '#'
+        if $y_range.include?(guard_point.my.y) && self.map[guard_point.my] != '#'
+          self.map[guard_point.my] = '#' 
+          self.obstacle = guard_point.my
+        end
       when :down
-        self.map[guard_point.py] = '#' if $y_range.include?(guard_point.py.y) && self.map[guard_point.py] != '#'
+        if $y_range.include?(guard_point.py.y) && self.map[guard_point.py] != '#'
+          self.map[guard_point.py] = '#' 
+          self.obstacle = guard_point.py
+        end
       when :left
-        self.map[guard_point.mx] = '#' if $x_range.include?(guard_point.mx.x) && self.map[guard_point.mx] != '#'
+        if $x_range.include?(guard_point.mx.x) && self.map[guard_point.mx] != '#'
+          self.map[guard_point.mx] = '#' 
+          self.obstacle = guard_point.mx
+        end
       when :right
-        self.map[guard_point.px] = '#' if $x_range.include?(guard_point.px.x) && self.map[guard_point.px] != '#'
+        if $x_range.include?(guard_point.px.x) && self.map[guard_point.px] != '#'
+          self.map[guard_point.px] = '#' 
+          self.obstacle = guard_point.px
+        end
       else
         raise 'invalid guard dir'
       end
@@ -125,12 +139,12 @@ states = [
   State.new(map: map, guard_point: guard_point, guard_dir: :up, traversed: Set[], object_placed: false, moves: 0)
 ]
 
+loop_points = Set[]
+
 until states.empty?
   state = states.shift
 
-  next if state.moves > 3
-
-  puts "Processing state: #{state}"
+  raise 'Guard off map' unless $x_range.include?(state.guard_point.x) && $y_range.include?(state.guard_point.y)
 
   if !state.object_placed
     # Make a copy with the object, and add to queue
@@ -139,19 +153,23 @@ until states.empty?
     states << new_state
   end
 
+  state.move_guard
+
   if state.looped?
     total += 1
+    puts "Looped #{total}"
+    raise 'Whoa' if nil == state.obstacle
+    loop_points << state.obstacle
     # Do not reprocess
+    next
   end
-
-  state.move_guard
 
   if state.guard_on_map?
     states << state
   end
-
-  #binding.irb
-
 end
 
 puts total
+# 1478 too high
+puts loop_points.count
+# 1408 too high

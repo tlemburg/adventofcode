@@ -7,7 +7,7 @@ class Point
   end
 
   def dup
-    self.new(x,y)
+    self.class.new(x,y)
   end
 
   def px(inc = 1)
