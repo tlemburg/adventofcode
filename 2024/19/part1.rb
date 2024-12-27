@@ -19,32 +19,24 @@ lines.first.split(', ').each do |towel|
   towels << towel
 end
 
-puts towels.inspect
-
 total = 0
 
 lines[2..-1].each do |line|
-  puts line
-  current_sets = [[]] # each towelset is an array of the towels used
-
-  until current_sets.empty?
-    current_set = current_sets.shift
-    puts "Current Set: #{current_set.inspect}"
-    start = current_set.map(&:length).sum
-
-    found = false
-    (start...line.length).to_a.reverse.each do |i|
-      if towels.include?(line[start..i])
-        found = true if i == line.length - 1
-        current_sets << current_set + [line[start..i]]
-        towels << (current_set + [line[start..i]]).join
+  reached = Set[0]
+  curr = 0
+  while (curr < line.length)
+    if reached.include?(curr)
+      # Check all towels that fit here, for each, add a new reached
+      towels.each do |towel|
+        if towel == line[curr...(curr+towel.length)]
+          reached << curr + towel.length
+        end
       end
     end
-    if found
-      total += 1
-      break
-    end
+    curr += 1
   end
+
+  total += 1 if reached.include?(line.length)
 end
 
 puts total
