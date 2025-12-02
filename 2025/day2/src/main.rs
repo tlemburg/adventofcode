@@ -11,7 +11,10 @@ fn main() {
     let ranges = line.split(',');
 
     for range in ranges {
-        let nums: Vec<i64> = range.split('-').map(|st| st.parse().expect("Could not parse int")).collect();
+        let nums: Vec<i64> = range
+            .split('-')
+            .map(|st| st.parse().expect("Could not parse int"))
+            .collect();
         let start = nums[0];
         let end = nums[1];
 
@@ -22,7 +25,7 @@ fn main() {
                     // get the first set
                     let target = &string[0..modulus];
                     for j in 1..(string.len() / modulus) {
-                        if &string[(j * modulus)..((j+1) * modulus)] != target {
+                        if &string[(j * modulus)..((j + 1) * modulus)] != target {
                             continue 'modulus_loop;
                         }
                     }
