@@ -43,8 +43,46 @@ lines.each do |line|
   end
 end
 
+class Tree
+  include Comparable
+  attr_reader :operands
+  attr_accessor :op
+
+  def initialize(op, operand1, operand2)
+    @op = op
+    @operands = [operand1, operand2].sort
+  end
+
+  def <=>(other)
+    
+  end
+
+  def to_s
+    "(#{@operands.first} #{@op} #{@operands.last})"
+  end
+end
+
+def correct_tree(bit)
+  raise 'nope' if bit < 0
+  case bit
+  when 0
+    Tree.new('XOR', 'x00', 'y00')
+  when 1
+    Tree.new('XOR', Tree.new('AND', 'x00', 'y00'), Tree.new('XOR', 'x01', 'y01'))
+  else
+    base_tree = correct_tree(bit-1)
+    base_tree.op = 'AND'
+    next_tree = Tree.new("OR", Tree.new('AND', "x#{(bit-1).to_s.rjust(2,'0')}", "y#{(bit-1).to_s.rjust(2,'0')}"), base_tree)
+    Tree.new('XOR', Tree.new('XOR', "x#{bit.to_s.rjust(2,'0')}", "y#{bit.to_s.rjust(2,'0')}"), next_tree)
+  end
+end
+
+p correct_tree(0)
+p correct_tree(1)
+p correct_tree(2)
+
 # Break down what every z output comes from
-(0..13).each do |i|
+(0..4).each do |i|
   next if i > 46
   locked_wires = Set[]
 
@@ -72,8 +110,7 @@ end
   # Other Z's beyond that can be inferred: (inferring zi+1 from zi)
   # 1. Convert the highest level XOR to AND (this is zi-esc)
   # 2. Add (x_i AND y_i) OR to the start (this is also zi-esc)
-  # 3. Add (x_i+1 XOR y_i+1) XOR to the start. This is the highest level
-  # XOR.
+  # 3. Add (x_i+1 XOR y_i+1) XOR to the start. This is the highest level XOR.
 
   p z_key
   p string
