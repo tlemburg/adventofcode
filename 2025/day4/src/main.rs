@@ -20,8 +20,17 @@ fn main() {
     }
 }
 
+struct Point {
+    x: i32,
+    y: i32,
+}
+
 fn part1(lines: &Vec<&str>) {
     let mut total = 0;
+    let min_x = 0;
+    let min_y = 0;
+    let max_x = lines[0].len() - 1;
+    let max_y = lines.count() - 1;
 
     println!("Total: {}", total);
 }
