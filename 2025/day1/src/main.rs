@@ -8,11 +8,13 @@ fn main() {
     let mut total: i32 = 0;
 
     for line in lines {
-        let letter = line.chars().collect::<Vec<_>>()[0];
-        let turn: u32 = line[1..].parse().expect("Oh no couldn't parse the dial turn");
+        let letter = &line[0..1];
+        let turn: u32 = line[1..]
+            .parse()
+            .expect("Oh no couldn't parse the dial turn");
 
-        if letter == 'R' {
-            for i in 0..turn {
+        if letter == "R" {
+            for _i in 0..turn {
                 dial -= 1;
                 dial = dial % 100;
                 if dial == 0 {
@@ -20,7 +22,7 @@ fn main() {
                 }
             }
         } else {
-            for i in 0..turn {
+            for _i in 0..turn {
                 dial += 1;
                 dial = dial % 100;
                 if dial == 0 {
