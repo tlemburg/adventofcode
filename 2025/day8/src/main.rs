@@ -47,7 +47,7 @@ struct Range {
 }
 
 fn part1(lines: &Vec<&str>, connections: i32) {
-    let mut total = 0;
+    let mut total: u128 = 1;
 
     let mut points: Vec<Point3D> = Vec::new();
 
@@ -67,11 +67,7 @@ fn part1(lines: &Vec<&str>, connections: i32) {
     // create a list of distance between all points
     let mut distances: Vec<(usize, usize, f64)> = Vec::new();
     for i in 0..points.len() {
-        for j in 0..points.len() {
-            if i == j {
-                continue;
-            }
-
+        for j in i + 1..points.len() {
             let distance = (((points[i].x - points[j].x).pow(2)
                 + (points[i].y - points[j].y).pow(2)
                 + (points[i].z - points[j].z).pow(2)) as f64)
@@ -85,27 +81,158 @@ fn part1(lines: &Vec<&str>, connections: i32) {
     distances.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
 
     // Make connections with teh shortest distances
-    let mut networks: Vec<HashSet<usize>> = Vec.new();
+    let mut networks: Vec<HashSet<usize>> = Vec::new();
 
+    // for every connection we are going to make (10 for test, 1000 for prod)
     for i in 0..connections {
-        let (conn1, conn2) = (distances[i].0, distances[i].1);
-        let found_networks: Vec<usize> = Vec::new();
+        let (node1, node2) = (distances[i as usize].0, distances[i as usize].1);
+        let mut found_networks: Vec<usize> = Vec::new();
 
+        // look through each network to see if the node is already present
         for (j, network) in networks.iter().enumerate() {
-            if network.contains(&conn1) {
+            if network.contains(&node1) {
                 found_networks.push(j);
             }
-            if network.contains(&conn2) {
+            if network.contains(&node2) {
                 found_networks.push(j);
+            }
+        }
+
+        // if no networks found, then create a new network
+        if found_networks.len() == 0 {
+            let mut new_set = HashSet::new();
+            new_set.insert(node1);
+            new_set.insert(node2);
+
+            networks.push(new_set);
+        }
+        if found_networks.len() == 1 {
+            networks[found_networks[0]].insert(node1);
+            networks[found_networks[0]].insert(node2);
+        }
+        if found_networks.len() == 2 {
+            // combine the networks if the found networks are not already the same
+            if found_networks[0] != found_networks[1] {
+                let mut new_set = HashSet::new();
+                for x in networks[found_networks[0]].clone() {
+                    new_set.insert(x);
+                }
+                for x in networks[found_networks[1]].clone() {
+                    new_set.insert(x);
+                }
+                networks.push(new_set);
+                networks[found_networks[0]] = HashSet::new();
+                networks[found_networks[1]] = HashSet::new();
             }
         }
     }
 
-    println!("Total: {}", distances.len());
+    networks.sort_by(|a, b| b.len().cmp(&a.len()));
+
+    for i in 0..3 {
+        total *= networks[i].len() as u128;
+    }
+
+    println!("Total: {}", total);
 }
 
 fn part2(lines: &Vec<&str>, connections: i32) {
-    let mut total = 0;
+    let mut total: u128 = 1;
+
+    let mut points: Vec<Point3D> = Vec::new();
+
+    for line in lines {
+        let nums: Vec<i128> = line
+            .split(",")
+            .map(|num| num.parse().expect("DIDN NOT PRASE"))
+            .collect();
+
+        points.push(Point3D {
+            x: nums[0],
+            y: nums[1],
+            z: nums[2],
+        });
+    }
+
+    // create a list of distance between all points
+    let mut distances: Vec<(usize, usize, f64)> = Vec::new();
+    for i in 0..points.len() {
+        for j in i + 1..points.len() {
+            let distance = (((points[i].x - points[j].x).pow(2)
+                + (points[i].y - points[j].y).pow(2)
+                + (points[i].z - points[j].z).pow(2)) as f64)
+                .sqrt();
+
+            distances.push((i, j, distance));
+        }
+    }
+
+    // Sort the distances
+    distances.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
+
+    // Make connections with teh shortest distances
+    let mut networks: Vec<HashSet<usize>> = Vec::new();
+    let mut connected: Vec<usize> = Vec::new();
+    let mut i: usize = 0;
+
+    // for every connection we are going to make (10 for test, 1000 for prod)
+    loop {
+        connected.push(distances[i].0);
+        connected.push(distances[i].1);
+        let (node1, node2) = (distances[i].0, distances[i].1);
+
+        i += 1;
+
+        let mut found_networks: Vec<usize> = Vec::new();
+
+        // look through each network to see if the node is already present
+        for (j, network) in networks.iter().enumerate() {
+            if network.contains(&node1) {
+                found_networks.push(j);
+            }
+            if network.contains(&node2) {
+                found_networks.push(j);
+            }
+        }
+
+        // if no networks found, then create a new network
+        if found_networks.len() == 0 {
+            let mut new_set = HashSet::new();
+            new_set.insert(node1);
+            new_set.insert(node2);
+
+            networks.push(new_set);
+        }
+        if found_networks.len() == 1 {
+            networks[found_networks[0]].insert(node1);
+            networks[found_networks[0]].insert(node2);
+        }
+        if found_networks.len() == 2 {
+            // combine the networks if the found networks are not already the same
+            if found_networks[0] != found_networks[1] {
+                let mut new_set = HashSet::new();
+                for x in networks[found_networks[0]].clone() {
+                    new_set.insert(x);
+                }
+                for x in networks[found_networks[1]].clone() {
+                    new_set.insert(x);
+                }
+                networks.push(new_set);
+                networks[found_networks[0]] = HashSet::new();
+                networks[found_networks[1]] = HashSet::new();
+            }
+        }
+
+        // clear out any hashsets that are empty
+        networks.retain(|set| !set.is_empty());
+
+        if networks.len() == 1 && networks[0].len() == points.len() {
+            break;
+        }
+    }
+
+    total = points[connected[connected.len() - 1]].x as u128
+        * points[connected[connected.len() - 2]].x as u128;
 
     println!("Total: {}", total);
 }
